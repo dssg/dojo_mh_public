@@ -1,0 +1,234 @@
+{
+    "joco110hsccclientmisc2eadiagnosis":
+    {
+        "event_date": "admission_date"
+    },
+    "joco110hsccclientmisc2eaimpression": 
+    {
+        "event_date": "incident_date"
+    },
+    "jocodcmexoverdosessuicides":
+    {
+        "event_date": "dateofdeath"
+    },
+    "jocojcmexoverdosessuicides":
+    {
+        "event_date": "dateofdeath"
+    },
+    "jocojcmhcadmissions":
+    {
+        "event_date": "admit_date"
+    },
+    "jocojcmhccalldetails2021":
+    {
+        "event_date": "call_date"
+    },
+    "jocojcmhccsassessments20172022":
+    {
+        "event_date": "assessment_date"
+    },
+    "jocojcmhcdiagnoses":
+    {
+        "event_date": "dx_date"
+    },
+    "jocojcmhcdischarges":
+    {
+        "event_date": "dschg_date"
+    },
+    "jocojcmhcoutcomes":
+    {
+        "event_date": "assess_date"
+    },
+    "jocojcmhcservices":
+    {
+        "event_date": "service_date"
+    },
+    "jocojimsinmatedata":
+    {
+        "event_date": "event_date"
+    },
+    "jocojimsmnh_attempts":
+    {
+        "event_date": "attempt_date"
+    },
+    "jocojimsprosdefdata":
+    {
+        "event_date": "event_date"
+    },
+    "jocomedactincidents":
+    {
+        "event_date": "incident_date"
+    },
+    "jocopdarrests":
+    {
+        "event_date": "date_arrest"
+    },
+    "jocojimssummonsdata" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsmnhdata":
+    {
+        "event_date": "book_date"
+    },
+    "jocojimsnameindex" :
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsinmatecharges" : 
+    {
+         "event_date": "event_date"
+    },
+    "jocojcdheencounter" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsmniprosnos" : 
+    {
+         "event_date": "event_date"
+    },
+    "jocojimsmnicasenos" : 
+    {   
+        "event_date": "event_date"
+    },
+    "jocojimsjuvinmatescars" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsmnicomments" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsprobstatus" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsmniempaddr" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsmnitraffic" : 
+    {
+        "event_date": "event_date"
+    },
+    "jocojimscasedata" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsbailhstbailinfo" : 
+    { 
+        "event_date": "event_date"
+        },
+    "jocojimsmnibooking" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimswarranthstlog" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimssummonsviolations" :
+    {
+        "event_date": "event_date"
+    },
+    "jocojimsbailhstcases" : 
+    {
+        "event_date": "event_date"
+    },
+    "jocojimscasehearings" : 
+    {
+        "event_date": "event_date"
+    },
+    "jocojimsprobdrugtest" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsprobtype" :
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsmniresaddr" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsprobationdata" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimscasesaddlpaid" : 
+    { 
+        "event_date": "event_date"
+    },
+    "joco110hsccclientmisc2eacharges" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsjuvinmatecharges" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsjuvinmatepov" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimswarrantmstdata" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsmniprobnos" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimswarrantmstlog" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsmnisummons" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsbailmstdata" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsbailmstbailinfo" : 
+    {
+         "event_date": "event_date"
+    },
+    "jocojimsjuvinmate" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimscasecharges" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsprobcustdays" :
+    { 
+        "event_date": "event_date"
+    },
+     "jocojimsjuvinmatedata" :
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsbailmstcases" : 
+    {
+         "event_date": "event_date"
+    },
+    "jocojimscasespaid" :
+    { 
+        "event_date": "event_date"
+    },
+    "jocoaimsbookings" : 
+    { 
+        "event_date": "event_date"
+    },
+     "jocojimswarranthstdata" : 
+    { 
+        "event_date": "event_date"
+    },
+    "jocojimsinmatescars" : 
+    { 
+        "event_date": "event_date"
+    }
+}

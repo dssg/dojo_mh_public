@@ -1,0 +1,20 @@
+export DUMP_FILE_NAME=/mnt/data/projects/dojo-mh/data/backup_20220625/jocoRepository2deid
+export PSQL_ROLE="'dojo-mh-role'"
+export DUMP_DATABASE_NAME=jocorepository2deid
+export DATABASE_NAME="dojo-mh"
+export READ_PSQL_ROLE='"dojo-mh-role"'
+export CLEANING=true
+
+export DUMP_ORIGINAL_SCHEMA_NAME=public
+export ENTITIES=false
+export RECORDS=false
+export EVENTS=false
+export TEST_PREFIX=test_
+export DUMP_UPDATED_SCHEMA_NAME=raw
+export ETL_OUTPUT_SCHEMA_NAME=clean
+export ETL_OUTPUT_SEMICLEAN_SCHEMA_NAME=semi_clean
+export ENTITIES_SCHEMA=entities
+export RECORDS_SCHEMA=records
+export SEMANTIC_SCHEMA=semantic
+export CLEAN_DUMP_SQL_PATH=raw/clean_dump.sql
+export CREATE_SEMANTIC_TABLES=true

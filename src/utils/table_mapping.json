@@ -1,0 +1,188 @@
+{
+    "jocojcmhcdischarges":
+    {
+    "col1" : "program_category",
+    "col2" : "dschg_category",
+    "event_date": "dschg_date",
+    "source" : "'JOCOJCMHCDEMOGRAPHICS.PATID'",
+    "data_source_unq_id" : "patid",
+    "client_unq_id" : "sourceid",
+    "schema": "clean"
+    },
+
+    "jocojcmhcadmissions":
+    {
+    "col1" : "program_category",
+    "col2" : "program_desc",
+    "event_date": "admit_date",
+    "source" : "'JOCOJCMHCDEMOGRAPHICS.PATID'",
+    "data_source_unq_id" : "patid",
+    "client_unq_id" : "sourceid",
+    "schema": "clean"
+    },
+
+    "jocojcmhcdemographics_dedupe":
+    {
+        "col1" : "sex",
+        "col2" : "city" ,
+        "event_date": "dob",
+        "source": "'JOCOJCMHCDEMOGRAPHICS.PATID'",
+        "data_source_unq_id": "patid",
+        "client_unq_id": "sourceid",
+        "schema": "clean",
+        "sql_query": "query_jocojcmhcdemographics.sql"
+    },
+    
+    "jocojcmhccalldetails20142020":
+    {
+        "col1" : "call_type",
+        "col2" : "presenting_issue",
+        "event_date": "call_date",
+        "source" : "'JOCOJCMHCDEMOGRAPHICS.PATID'",
+        "data_source_unq_id" : "patid",
+        "client_unq_id" : "sourceid",
+        "schema": "test_raw",
+        "sql_query": "query_jocojcmhccalldetails20142020.sql"
+    },
+
+    "jocojcmhccalldetails2021":
+    {
+        "col1" : "call_type",
+        "col2" : "presenting_issue",
+        "event_date": "call_date",
+        "source" : "'JOCOJCMHCDEMOGRAPHICS.PATID'",
+        "data_source_unq_id" : "patid",
+        "client_unq_id" : "sourceid",
+        "schema" : "test_raw",
+        "sql_query": "query_jocojcmhccalldetails2021.sql"
+    },
+
+    "jocoaimsbookings":
+    {
+        "col1" : "releasedate",
+        "col2" : "chargedesc",
+        "event_date": "arrestdate",
+        "source": "'JOCOAIMSBOOKINGS.CFN'",
+        "data_source_unq_id": "hash_cfn",
+        "client_unq_id" : "hash_sourceid",
+        "schema" : "test_raw",
+        "sql_query": "query_jocoaimsbookings.sql"
+
+    },
+    
+    "jocopdarrests":
+    {
+        "col1" : "charge",
+        "col2" : "arr_type",
+        "event_date": "date_arrest",
+        "source": "'JOCOPDARRESTS.NAME_ID'",
+        "data_source_unq_id": "name_id",
+        "client_unq_id": "sourceid",
+        "schema": "clean",
+        "sql_query": "query_jocopdarrests.sql"
+    },
+
+    "jocojcmhcservices":
+    {
+        "col1" : "service_desc",
+        "col2" : "service_code" ,
+        "event_date": "service_date",
+        "source": "'JOCOJCMHCDEMOGRAPHICS.PATID'",
+        "data_source_unq_id": "patid",
+        "client_unq_id": "sourceid",
+        "schema": "clean",
+        "sql_query": "query_jocojcmhcservices.sql"
+    },
+
+    "jocojcmhcoutcomes":
+    {
+        "col1" : "dla_score",
+        "col2" : "cafas_score" ,
+        "event_date": "assess_date",
+        "source": "'JOCOJCMHCDEMOGRAPHICS.PATID'",
+        "data_source_unq_id": "patid",
+        "client_unq_id": "sourceid",
+        "schema": "clean",
+        "sql_query": "query_jocojcmhcoutcomes.sql"
+    },
+    
+    "jocojcmhcdemographics":
+    {
+        "col1" : "sex",
+        "col2" : "city" ,
+        "event_date": "dob",
+        "source": "'JOCOJCMHCDEMOGRAPHICS.PATID'",
+        "data_source_unq_id": "patid",
+        "client_unq_id": "sourceid",
+        "schema": "clean",
+        "sql_query": "query_jocojcmhcdemographics.sql"
+    },
+
+    "jocomedactincidents":
+    {
+        "col1" : "primary_impression",
+        "col2" : "secondary_impression" ,
+        "event_date": "incidentdate",
+        "source": "'JOCOMEDACTINCIDENTS.RCDID'",
+        "data_source_unq_id" : "hash_rcdid",
+        "client_unq_id" : "hash_sourceid",
+        "schema": "clean",
+        "sql_query": "query_jocomedactincidents.sql"
+
+    },
+    "jocojcmhcdiagnoses":
+    {
+        "col1" : "dx_code",
+        "col2" : "diagnosis_classification" ,
+        "event_date": "dx_date",
+        "source": "'JOCOJCMHCDEMOGRAPHICS.PATID'",
+        "data_source_unq_id": "patid",
+        "client_unq_id": "sourceid",
+        "schema": "clean",
+        "sql_query": "query_jocojcmhcdiagnoses.sql"
+    },
+    "joco110hsccclientmisc2eadiagnosis":
+    {
+        "col1": "primary_diagnosis_classification",
+        "col2": "secondary_diagnosis_classification",
+        "event_date": "admission_date",
+        "source": "'JOCO110HSCCCLIENT2.CLIENTID'",
+        "data_source_unq_id": "clientid",
+        "client_unq_id": "sourceid",
+        "schema": "clean",
+        "sql_query": "query_joco110hsccclientmisc2eadiagnosis.sql"
+    },
+    "jocojcmexoverdosessuicides":
+    {
+        "col1": "mannerofdeath",
+        "col2": "mechanism",
+        "event_date": "dateofdeath",
+        "source": "'JOCOJCMEXOVERDOSESSUICIDES.ID'",
+        "data_source_unq_id": "id",
+        "client_unq_id": "sourceid",
+        "schema": "clean",
+        "sql_query": "query_jocojcmexoverdosessuicides.sql"
+    },
+    "jocodcmexoverdosessuicides":
+    {
+        "col1": "mannerofdeath",
+        "col2": "causeofdeath1",
+        "event_date": "dateofdeath",
+        "source": "'JOCODCMEXOVERDOSESSUICIDES.CASENUM'",
+        "data_source_unq_id": "casenum",
+        "client_unq_id": "sourceid",
+        "schema": "clean",
+        "sql_query": "query_jocodcmexoverdosessuicides.sql"
+    },
+    "joco110hsccclientmisc2eaimpression":
+    {
+        "col1": "primary_impression",
+        "col2": "secondary_impression",
+        "event_date": "timeincident",
+        "source": "'JOCO110HSCCCLIENT2.CLIENTID'",
+        "data_source_unq_id": "clientid",
+        "client_unq_id": "sourceid",
+        "schema": "clean",
+        "sql_query": "query_joco110hsccclientmisc2eaimpression.sql"
+    }
+}

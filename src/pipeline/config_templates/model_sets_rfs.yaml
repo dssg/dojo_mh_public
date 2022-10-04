@@ -1,0 +1,6 @@
+'sklearn.ensemble.RandomForestClassifier':
+  n_estimators: [1000, 10000]
+  max_features: ['sqrt']
+  max_depth: [100, 250]
+  min_samples_split: [10]
+  n_jobs: [90]

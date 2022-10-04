@@ -1,0 +1,54 @@
+'sklearn.ensemble.GradientBoostingClassifier':
+    loss: ['log_loss']
+    n_estimators: [50, 100, 250, 500, 1000]
+    learning_rate: [0.10, 0.50, 1]
+'sklearn.ensemble.AdaBoostClassifier':
+    n_estimators: [50, 100, 250, 500, 1000]
+    learning_rate: [0.10, 0.50, 1]
+'sklearn.linear_model.LogisticRegression':
+    penalty: ['l2']
+    C: [0.00001, 0.0001, 0.01, 0.1, 1, 2]
+'sklearn.tree.DecisionTreeClassifier':
+  criterion: ['gini', 'entropy', 'log_loss']
+  max_depth: [1, 2, 5, 10, 100, 250]
+  max_features: ['sqrt', 1.0]
+'LGBMClassifier':
+    n_estimators: [100]
+    max_depth: [10]
+    boosting_type: ['dart']
+'FeatureRanker':
+   features: [
+     ['dem_age', '__flip__event_days_since_last'],
+     ['__flip__event_days_since_last', '__flip__sem_amb_days_since_last'],
+     ['__flip__sem_amb_days_since_last', '__flip__event_days_since_last'],
+     ['__flip__semdiag_days_since_last', '__flip__event_days_since_last'],
+     ['__flip__mhcadmiss_days_since_last', '__flip__event_days_since_last'],
+     ['__flip__sem_amb_days_snc_lst_drug', '__flip__event_days_since_last'],
+     ['__flip__mhcserv_days_since_last', '__flip__event_days_since_last'],
+     ['mhcadmiss_prog_total_sum_9999m', '__flip__event_days_since_last'],
+     ['sem_amb_runs_sum_9999m', '__flip__event_days_since_last'],
+     ['dcservice_emergency_sum_12m', '__flip__event_days_since_last'],
+     ['jailbook_books_total_sum_9999m', '__flip__event_days_since_last'],
+     ['__flip__sem_amb_days_since_last', '__flip__event_days_since_last'],
+     ['__flip__jimscharges_days_since_last', '__flip__event_days_since_last'],
+     ['__flip__jimsproschrg_days_since_last', '__flip__event_days_since_last'],
+     ['__flip__jailbook_days_since_last', '__flip__event_days_since_last'],
+     ['__flip__jailbook_days_since_first', '__flip__event_days_since_last'],
+     ['__flip__semdiag_days_since_last', '__flip__event_days_since_last']
+  ]
+# Baseline similar to DoCo high utilizer algorithm
+'LinearRanker':
+  features: [['sem_amb_runs_sum_9999m',
+      'sem_amb_runs_suicidal_sum_9999m',
+      'sem_amb_runs_suic_attempt_sum_9999m',
+      'sem_amb_runs_drug_sum_9999m',
+      'sem_amb_runs_alc_sum_9999m',
+      'sem_amb_runs_other_mental_sum_9999m',
+      'semdiag_diag_total_sum_9999m',
+      'semdiag_mhicd10_sum_9999m',
+      'jailbook_jail_days_sum_9999m',
+      'jailbook_books_total_sum_9999m',
+      'dcservice_services_total_sum_9999m',
+      'mhcserv_services_total_sum_9999m'
+      ]]
+  weights: [[0.3, 0.7, 0.7, 0.7, 0.7, 0.7, 0.4, 0.9, 0.75, 0.6, 0.3, 0.3]]

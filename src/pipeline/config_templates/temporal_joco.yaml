@@ -1,0 +1,7 @@
+max_train_history_months: 60 # maximum difference between train start and train end for a fold (in months)
+min_train_history_months: 0 # minimum difference between train start and train end in a given fold (in months)
+absolute_train_start: '2017-06-01' # absolute minimum date for which it is possible to train models on (all relevant data exists)
+latest_validation_date: '2021-09-01' # maximum date for validation (allow [months_future] months into the future with existing data)
+train_sampling_freq_months: 3 # months between train samples within one fold
+multiple_folds: 1 # 0 to run 1 single fold, 1 to run multiple folds (restricted to other temporal constraints)
+fold_shift_months: 3 # months between folds

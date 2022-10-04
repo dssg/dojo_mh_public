@@ -1,0 +1,10 @@
+**/__pycache__/
+infrastructure/database_setup/ETL/raw/clean_dump.sql
+infrastructure/database_setup/ETL/data_cleaning/etl.log
+src/src.egg-info
+src/pipeline/logs/*
+.envrc
+.env
+.venv/
+**/.pytest_cache/
+**/.ipynb_checkpoints

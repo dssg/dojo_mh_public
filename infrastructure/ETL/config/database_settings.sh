@@ -1,0 +1,10 @@
+export DUMP_FILE_NAME=/mnt/data/projects/dojo-mh/data/backup_20220625/jocoRepository2deid
+export PSQL_ROLE="'dojo-mh-role'"
+export DUMP_DATABASE_NAME=jocorepository2deid
+export DATABASE_NAME="dojo-mh"
+export DUMP_ORIGINAL_SCHEMA_NAME=public
+export DUMP_UPDATED_SCHEMA_NAME=raw
+export ETL_OUTPUT_SCHEMA_NAME=cleaned
+export READ_PSQL_ROLE='"dojo-mh-role"'
+export TEST_PREFIX=
+export CLEAN_DUMP_SQL_PATH=raw/clean_dump.sql # if there is an existing sql path for creating dump it should go here

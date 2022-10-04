@@ -1,0 +1,137 @@
+{
+    "jocomedactincidents":
+    {
+        "schema": "clean",
+        "type_demographics": [ "dob","race", "sex"],
+        "type_demographics_raw": " dob::varchar, race, sex"
+    },
+
+    "jocoaimsbookings":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob","race", "sex"],
+        "type_demographics_raw": " dob::varchar, race, sex"
+    },
+    "jocodcmexoverdosessuicides":
+    {
+        "schema": "clean",
+        "type_demographics": [ "dob", "sex"],
+        "type_demographics_raw": " dateofbirth::varchar, sex"
+    },
+    "jocojcdheencounter":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob","race", "sex"],
+        "type_demographics_raw": " dob::varchar, race, sex"
+    },
+
+    "jocojimscasedata":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob","race", "sex"],
+        "type_demographics_raw": " dob::varchar, race, sex"
+    },
+    "jocojimsjuvinmate":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob", "race", "sex", "ethnicity"],
+        "type_demographics_raw": " dob::varchar, race, sex, ethnicity::varchar"
+    },
+    "jocojimsinmatedata":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob","race", "sex", "ethnicity"],
+        "type_demographics_raw": " dob::varchar, race, sex, ethnicity::varchar"
+    },
+    "jocojimsjuvinmatedata":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob", "race", "sex", "ethnicity"],
+        "type_demographics_raw": " dob::varchar, race, sex, ethnicity::varchar"
+    },
+
+    "jocojimssummonsdata":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob", "race", "sex", "ethnicity"],
+        "type_demographics_raw": " dob::varchar, race, sex, ethnicity::varchar"
+    },
+    "jocojimsmnhdata":
+    {
+        "schema": "clean",
+        "type_demographics": [ "dob", "sex"],
+        "type_demographics_raw": " dob::varchar, gender"
+    },
+    "jocojimsnameindex":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob","race", "sex", "ethnicity"],
+        "type_demographics_raw": " dob::varchar, race, sex, ethnicity::varchar"
+    },
+    "jocojimsprosdefdata":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob", "race", "sex", "ethnicity"],
+        "type_demographics_raw": " dob::varchar, race, sex, ethnicity::varchar"
+    },
+    "jocojimswarranthstdata":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob","race", "sex"],
+        "type_demographics_raw": " dob::varchar, race, sex"
+    },
+    "jocojimswarrantmstdata":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob","race", "sex"],
+        "type_demographics_raw": " dob::varchar, race, sex"
+    },
+    "jocojcmhcdemographics":
+    {
+        "schema": "clean",
+        "type_demographics": [ "dob","race", "sex"],
+        "type_demographics_raw": " dob::varchar, race, sex"
+    },
+    "joco110hsccclient2":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob","race", "sex"],
+        "type_demographics_raw": " clientbirthdate::date::varchar, race, sex"
+    },
+    "jocokdocdemographics":
+    {
+        "schema": "semi_clean",
+        "type_demographics": ["race", "sex", "ethnicity"],
+        "type_demographics_raw": " race, sex, ethnicity::varchar"
+    },
+    "jocojimsbailhstdata":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob","race", "sex"],
+        "type_demographics_raw": " dob::varchar, race, sex"
+    },
+    "jocojimsbailmstdata":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob","race", "sex"],
+        "type_demographics_raw": " dob::varchar, race, sex"
+    },
+    "jocojimsbailmstdata":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob","race", "sex"],
+        "type_demographics_raw": " dob::varchar, race, sex"
+    },
+    "jocojimsbailhstdata":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "dob","race", "sex"],
+        "type_demographics_raw": " dob::varchar, race, sex"
+    },
+    "jocojimsprobationdata":
+    {
+        "schema": "semi_clean",
+        "type_demographics": [ "ethnicity"],
+        "type_demographics_raw": " ethnicity::varchar"
+    }
+}

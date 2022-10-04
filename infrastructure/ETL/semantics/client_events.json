@@ -1,0 +1,73 @@
+{
+    "joco110hsccclientmisc2eadiagnosis":
+    {
+        "event_type": "HOSPITAL",
+        "schema": "clean"
+    },
+    "joco110hsccclientmisc2eaimpression":
+    {
+        "event_type": "AMBULANCE",
+        "schema": "clean"
+    },
+    "jocodcmexoverdosessuicides":
+    {
+        "event_type": "DEATH",
+        "schema": "clean"
+    },
+    "jocojcmexoverdosessuicides":
+    {
+        "event_type": "DEATH",
+        "schema": "clean"
+    },
+    "jocojcmhcadmissions":
+    {
+        "event_type": "MENTAL HEALTH",
+        "schema": "clean"
+    },
+    "jocojcmhccsassessments20172022":
+    {
+        "event_type": "MENTAL HEALTH",
+        "schema": "clean"
+    },
+    "jocojcmhcdiagnoses":
+    {
+        "event_type": "MENTAL HEALTH",
+        "schema": "clean"
+    },
+    "jocojcmhcdischarges":
+    {
+        "event_type": "MENTAL HEALTH",
+        "schema": "clean"
+    },
+    "jocojcmhcoutcomes":
+    {
+        "event_type": "MENTAL HEALTH",
+        "schema": "clean"
+    },
+    "jocojcmhcservices":
+    {
+        "event_type": "MENTAL HEALTH",
+        "schema": "clean"
+    },
+    "jocojimsmnh_attempts":
+    {
+        "event_type": "CALL",
+        "schema": "clean"
+    },
+    "jocojimsmnhdata":
+    {
+        "event_type": "MENTAL HEALTH",
+        "schema": "clean"
+    },
+    "jocomedactincidents":
+    {
+        "event_type": "AMBULANCE",
+        "schema": "clean"
+    },
+    "jocopdarrests":
+    {
+        "event_type": "ARREST",
+        "schema": "clean"
+    }
+}
+

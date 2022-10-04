@@ -1,0 +1,3191 @@
+cohort:
+  interval_back: 1 year
+county: joco
+features:
+  ambulance_runs:
+    county: both
+    features:
+      agg:
+        runs:
+          agg_arg: case when primary_impression is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 60 months
+          - 9999 months
+        runs_alc:
+          agg_arg: case when alcohol_flag then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 60 months
+          - 9999 months
+        runs_drug:
+          agg_arg: case when drug_flag then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 60 months
+          - 9999 months
+        runs_drug_pois:
+          agg_arg: case when drug_poisoning_flag then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 60 months
+          - 9999 months
+        runs_other_mental:
+          agg_arg: case when other_mental_crisis_flag then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 60 months
+          - 9999 months
+        runs_suic_attempt:
+          agg_arg: case when suicide_attempt_flag then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 60 months
+          - 9999 months
+        runs_suicidal:
+          agg_arg: case when suicidal_flag then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 60 months
+          - 9999 months
+      numerical:
+        alcohol_flag:
+          arg: MAX(case when alcohol_flag then 1 else 0 end)
+          impute_val: '0'
+        amb_run_flag:
+          arg: MAX(case when event_date is not null then 1 else 0 end)
+          impute_val: '0'
+        days_since_last:
+          arg: as_of_date - MAX(event_date)
+          impute_val: '999999'
+        days_snc_lst_alcohol:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where alcohol_flag)
+          impute_val: '999999'
+        days_snc_lst_drug:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where drug_flag)
+          impute_val: '999999'
+        days_snc_lst_mental_crisis:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where other_mental_crisis_flag)
+          impute_val: '999999'
+        days_snc_lst_suicidal:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where suicidal_flag)
+          impute_val: '999999'
+        days_snc_lst_suicide_attempt:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where suicide_attempt_flag)
+          impute_val: '999999'
+        drug_flag:
+          arg: MAX(case when drug_flag then 1 else 0 end)
+          impute_val: '0'
+        other_mental_crisis_flag:
+          arg: MAX(case when other_mental_crisis_flag then 1 else 0 end)
+          impute_val: '0'
+        suicidal_flag:
+          arg: MAX(case when suicidal_flag then 1 else 0 end)
+          impute_val: '0'
+        suicide_attempt_flag:
+          arg: MAX(case when suicide_attempt_flag then 1 else 0 end)
+          impute_val: '0'
+    from_arg: semantic.ambulance_runs
+    impute_agg: 0
+    knowledge_date: event_date
+    table_prefix: sem_amb
+  client_events:
+    county: both
+    features:
+      categorical:
+        seasonality_month:
+          arg: extract(month from as_of_date)::varchar
+          impute_val: 'NULL'
+      numerical:
+        days_since_last:
+          arg: as_of_date::date - max(event_date)
+          impute_val: 999999
+    from_arg: semantic.client_events
+    knowledge_date: event_date
+    table_prefix: event
+  demographics:
+    county: both
+    features:
+      categorical:
+        race:
+          arg: mode() within group (order by demographics_value)
+          filter: filter (where demographics_type = 'race')
+          impute_val: 'NULL'
+        sex:
+          arg: mode() within group (order by demographics_value)
+          filter: filter (where demographics_type = 'sex')
+          impute_val: 'NULL'
+      numerical:
+        age:
+          arg: ' case when ((as_of_date::date - (mode() within group (order by demographics_value::date)
+            filter (where demographics_type = ''dob''))) / 365.25) between 5.0 and
+            90.0 then ((as_of_date::date - (mode() within group (order by demographics_value::date)
+            filter (where demographics_type = ''dob''))) / 365.25) else null end'
+          impute_val: 'NULL'
+        age_imp:
+          arg: ' case when case when ((as_of_date::date - (mode() within group (order
+            by demographics_value::date) filter (where demographics_type = ''dob'')))
+            / 365.25) between 5.0 and 90.0 then true else false end then 0 else 1
+            end'
+          impute_val: '0'
+    from_arg: semantic.demographics
+    knowledge_date: event_date
+    table_prefix: dem
+  diagnoses:
+    county: both
+    features:
+      agg:
+        diag_abuse:
+          agg_arg: case when prim_diag_class='ABUSE OR NEGLECT' or sec_diag_class='ABUSE
+            OR NEGLECT' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_anxiety:
+          agg_arg: case when prim_diag_class='ANXIETY' or sec_diag_class='ANXIETY'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_bipolar:
+          agg_arg: case when prim_diag_class='BIPOLAR' or sec_diag_class='BIPOLAR'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_criminal:
+          agg_arg: case when prim_diag_class='CRIMINAL' or sec_diag_class='CRIMINAL'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_depress:
+          agg_arg: case when prim_diag_class='DEPRESSIVE' or sec_diag_class='DEPRESSIVE'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_eating:
+          agg_arg: case when prim_diag_class='FEEDING OR EATING' or sec_diag_class='FEEDING
+            OR EATING' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_economic:
+          agg_arg: case when prim_diag_class='HOUSING OR ECONOMIC' or sec_diag_class='HOUSING
+            OR ECONOMIC' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_family:
+          agg_arg: case when prim_diag_class='OTHER FAMILY' or sec_diag_class='OTHER
+            FAMILY' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_gender_dis:
+          agg_arg: case when prim_diag_class='GENDER DYSPHORIA' or sec_diag_class='GENDER
+            DYSPHORIA' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_other_addict:
+          agg_arg: case when prim_diag_class='OTHER SUBSTANCE-RELATED OR ADDICTIVE'
+            or sec_diag_class='OTHER SUBSTANCE-RELATED OR ADDICTIVE' then 1 else 0
+            end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_other_mh:
+          agg_arg: case when prim_diag_class='OTHER MENTAL DISORDER' or sec_diag_class='OTHER
+            MENTAL DISORDER' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_personal:
+          agg_arg: case when prim_diag_class='PERSONALITY' or sec_diag_class='PERSONALITY'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_psychotic:
+          agg_arg: case when prim_diag_class='PSYCHOTIC' or sec_diag_class='PSYCHOTIC'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_ptsd:
+          agg_arg: case when prim_diag_class='TRAUMA- OR STRESSOR- RELATED' or sec_diag_class='TRAUMA-
+            OR STRESSOR- RELATED' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_self_harm:
+          agg_arg: case when prim_diag_class='SUICIDE IDEATION OR SELF-HARM' or sec_diag_class='SUICIDE
+            IDEATION OR SELF-HARM' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_substance:
+          agg_arg: case when prim_diag_class='SUBSTANCE-RELATED' or sec_diag_class='SUBSTANCE-RELATED'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_total:
+          agg_arg: case when prim_diag_class is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        mhicd10:
+          agg_arg: case when mh_diag_flag then 1 else 0 end
+          agg_func:
+          - SUM
+          - MAX
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+      numerical:
+        abuse_neglect_flag:
+          arg: MAX(case when prim_diag_class='ABUSE OR NEGLECT' or sec_diag_class='ABUSE
+            OR NEGLECT' then 1 else 0 end)
+          impute_val: '0'
+        anxiety_flag:
+          arg: MAX(case when prim_diag_class='ANXIETY' or sec_diag_class='ANXIETY'
+            then 1 else 0 end)
+          impute_val: '0'
+        bipolar_flag:
+          arg: MAX(case when prim_diag_class='BIPOLAR' or sec_diag_class='BIPOLAR'
+            then 1 else 0 end)
+          impute_val: '0'
+        criminal_flag:
+          arg: MAX(case when prim_diag_class='CRIMINAL' or sec_diag_class='CRIMINAL'
+            then 1 else 0 end)
+          impute_val: '0'
+        days_since_last:
+          arg: as_of_date - MAX(diag_date)
+          impute_val: '999999'
+        days_since_last_imp:
+          arg: case when (as_of_date - MAX(diag_date)) is null then 1 else 0 end
+          impute_val: '0'
+        days_snc_lst_abuse_neglect:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='ABUSE OR NEGLECT' or sec_diag_class='ABUSE
+            OR NEGLECT')
+          impute_val: '999999'
+        days_snc_lst_anxiety:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='ANXIETY' or sec_diag_class='ANXIETY')
+          impute_val: '999999'
+        days_snc_lst_bipolar:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='BIPOLAR' or sec_diag_class='BIPOLAR')
+          impute_val: '999999'
+        days_snc_lst_criminal:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='CRIMINAL' or sec_diag_class='CRIMINAL')
+          impute_val: '999999'
+        days_snc_lst_depr:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='DEPRESSIVE' or sec_diag_class='DEPRESSIVE')
+          impute_val: '999999'
+        days_snc_lst_eating:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='FEEDING OR EATING' or sec_diag_class='FEEDING
+            OR EATING')
+          impute_val: '999999'
+        days_snc_lst_economic:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='HOUSING OR ECONOMIC' or sec_diag_class='HOUSING
+            OR ECONOMIC')
+          impute_val: '999999'
+        days_snc_lst_family:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='OTHER FAMILY' or sec_diag_class='OTHER
+            FAMILY')
+          impute_val: '999999'
+        days_snc_lst_gender_dis:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='GENDER DYSPHORIA' or sec_diag_class='GENDER
+            DYSPHORIA')
+          impute_val: '999999'
+        days_snc_lst_mh_flag:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where mh_diag_flag)
+          impute_val: '999999'
+        days_snc_lst_other_addict:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='OTHER SUBSTANCE-RELATED OR ADDICTIVE'
+            or sec_diag_class='OTHER SUBSTANCE-RELATED OR ADDICTIVE')
+          impute_val: '999999'
+        days_snc_lst_other_mh:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='OTHER MENTAL DISORDER' or sec_diag_class='OTHER
+            MENTAL DISORDER')
+          impute_val: '999999'
+        days_snc_lst_personality:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='PERSONALITY' or sec_diag_class='PERSONALITY')
+          impute_val: '999999'
+        days_snc_lst_psychotic:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='PSYCHOTIC' or sec_diag_class='PSYCHOTIC')
+          impute_val: '999999'
+        days_snc_lst_self_harm:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='SUICIDE IDEATION OR SELF-HARM' or
+            sec_diag_class='SUICIDE IDEATION OR SELF-HARM')
+          impute_val: '999999'
+        days_snc_lst_subs_use:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='SUBSTANCE-RELATED' or sec_diag_class='SUBSTANCE-RELATED')
+          impute_val: '999999'
+        days_snc_lst_trauma:
+          arg: as_of_date - MAX(diag_date)
+          filter: filter (where prim_diag_class='TRAUMA- OR STRESSOR- RELATED' or
+            sec_diag_class='TRAUMA- OR STRESSOR- RELATED')
+          impute_val: '999999'
+        depr_flag:
+          arg: MAX(case when prim_diag_class='DEPRESSIVE' or sec_diag_class='DEPRESSIVE'
+            then 1 else 0 end)
+          impute_val: '0'
+        eating_flag:
+          arg: MAX(case when prim_diag_class='FEEDING OR EATING' or sec_diag_class='FEEDING
+            OR EATING' then 1 else 0 end)
+          impute_val: '0'
+        economic_flag:
+          arg: MAX(case when prim_diag_class='HOUSING OR ECONOMIC' or sec_diag_class='HOUSING
+            OR ECONOMIC' then 1 else 0 end)
+          impute_val: '0'
+        family_harm_flag:
+          arg: MAX(case when prim_diag_class='OTHER FAMILY' or sec_diag_class='OTHER
+            FAMILY' then 1 else 0 end)
+          impute_val: '0'
+        gender_dis_flag:
+          arg: MAX(case when prim_diag_class='GENDER DYSPHORIA' or sec_diag_class='GENDER
+            DYSPHORIA' then 1 else 0 end)
+          impute_val: '0'
+        other_addict_flag:
+          arg: MAX(case when prim_diag_class='OTHER SUBSTANCE-RELATED OR ADDICTIVE'
+            or sec_diag_class='OTHER SUBSTANCE-RELATED OR ADDICTIVE' then 1 else 0
+            end)
+          impute_val: '0'
+        other_mh_flag:
+          arg: MAX(case when prim_diag_class='OTHER MENTAL DISORDER' or sec_diag_class='OTHER
+            MENTAL DISORDER' then 1 else 0 end)
+          impute_val: '0'
+        personality_flag:
+          arg: MAX(case when prim_diag_class='PERSONALITY' or sec_diag_class='PERSONALITY'
+            then 1 else 0 end)
+          impute_val: '0'
+        psychotic_flag:
+          arg: MAX(case when prim_diag_class='PSYCHOTIC' or sec_diag_class='PSYCHOTIC'
+            then 1 else 0 end)
+          impute_val: '0'
+        self_harm_flag:
+          arg: MAX(case when prim_diag_class='SUICIDE IDEATION OR SELF-HARM' or sec_diag_class='SUICIDE
+            IDEATION OR SELF-HARM' then 1 else 0 end)
+          impute_val: '0'
+        subs_use_flag:
+          arg: MAX(case when prim_diag_class='SUBSTANCE-RELATED' or sec_diag_class='SUBSTANCE-RELATED'
+            then 1 else 0 end)
+          impute_val: '0'
+        trauma_flag:
+          arg: MAX(case when prim_diag_class='TRAUMA- OR STRESSOR- RELATED' or sec_diag_class='TRAUMA-
+            OR STRESSOR- RELATED' then 1 else 0 end)
+          impute_val: '0'
+    from_arg: semantic.diagnoses
+    impute_agg: 0
+    knowledge_date: diag_date
+    table_prefix: semdiag
+  jail_bookings:
+    county: both
+    features:
+      agg:
+        books_total:
+          agg_arg: case when end_date is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        jail_days:
+          agg_arg: end_date - start_date
+          agg_func:
+          - SUM
+          intervals:
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 60 months
+          - 9999 months
+      numerical:
+        bookings_flag:
+          arg: MAX(case when end_date is not null then 1 else 0 end)
+          impute_val: '0'
+        days_since_first:
+          arg: as_of_date - MIN(end_date)
+          impute_val: '999999'
+        days_since_last:
+          arg: as_of_date - MAX(end_date)
+          impute_val: '999999'
+    from_arg: semantic.jail_bookings
+    impute_agg: 0
+    knowledge_date: end_date
+    table_prefix: jailbook
+  joco110hsccclientmisc2eacharges:
+    county: doco
+    features:
+      agg:
+        charge_total:
+          agg_arg: case when charges is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+      numerical:
+        charges_flag:
+          arg: MAX(case when event_date is not null then 1 else 0 end)
+          impute_val: '0'
+        days_since_last:
+          arg: as_of_date - MAX(event_date)
+          impute_val: '999999'
+    from_arg: semi_clean.joco110hsccclientmisc2eacharges
+    impute_agg: 0
+    knowledge_date: event_date
+    table_prefix: dccharges
+  joco110hsccclientmisc2eadiagnosis:
+    county: doco
+    features:
+      agg:
+        diag_abuse:
+          agg_arg: case when primary_diagnosis_classification='ABUSE OR NEGLECT' or
+            secondary_diagnosis_classification='ABUSE OR NEGLECT' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_anxiety:
+          agg_arg: case when primary_diagnosis_classification='ANXIETY' or secondary_diagnosis_classification='ANXIETY'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_bipolar:
+          agg_arg: case when primary_diagnosis_classification='BIPOLAR' or secondary_diagnosis_classification='BIPOLAR'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_criminal:
+          agg_arg: case when primary_diagnosis_classification='CRIMINAL' or secondary_diagnosis_classification='CRIMINAL'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_depress:
+          agg_arg: case when primary_diagnosis_classification='DEPRESSIVE' or secondary_diagnosis_classification='DEPRESSIVE'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_eating:
+          agg_arg: case when primary_diagnosis_classification='FEEDING OR EATING'
+            or secondary_diagnosis_classification='FEEDING OR EATING' then 1 else
+            0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_economic:
+          agg_arg: case when primary_diagnosis_classification='HOUSING OR ECONOMIC'
+            or secondary_diagnosis_classification='HOUSING OR ECONOMIC' then 1 else
+            0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_family:
+          agg_arg: case when primary_diagnosis_classification='OTHER FAMILY' or secondary_diagnosis_classification='OTHER
+            FAMILY' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_gender_dis:
+          agg_arg: case when primary_diagnosis_classification='GENDER DYSPHORIA' or
+            secondary_diagnosis_classification='GENDER DYSPHORIA' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_other_addict:
+          agg_arg: case when primary_diagnosis_classification='OTHER SUBSTANCE-RELATED
+            OR ADDICTIVE' or secondary_diagnosis_classification='OTHER SUBSTANCE-RELATED
+            OR ADDICTIVE' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_other_mh:
+          agg_arg: case when primary_diagnosis_classification='OTHER MENTAL DISORDER'
+            or secondary_diagnosis_classification='OTHER MENTAL DISORDER' then 1 else
+            0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_personal:
+          agg_arg: case when primary_diagnosis_classification='PERSONALITY' or secondary_diagnosis_classification='PERSONALITY'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_psychotic:
+          agg_arg: case when primary_diagnosis_classification='PSYCHOTIC' or secondary_diagnosis_classification='PSYCHOTIC'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_ptsd:
+          agg_arg: case when primary_diagnosis_classification='TRAUMA- OR STRESSOR-
+            RELATED' or secondary_diagnosis_classification='TRAUMA- OR STRESSOR- RELATED'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_self_harm:
+          agg_arg: case when primary_diagnosis_classification='SUICIDE IDEATION OR
+            SELF-HARM' or secondary_diagnosis_classification='SUICIDE IDEATION OR
+            SELF-HARM' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_substance:
+          agg_arg: case when primary_diagnosis_classification='SUBSTANCE-RELATED'
+            or secondary_diagnosis_classification='SUBSTANCE-RELATED' then 1 else
+            0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_total:
+          agg_arg: case when primary_diagnosis_classification is not null then 1 else
+            0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+      numerical:
+        abuse_neglect_flag:
+          arg: MAX(case when primary_diagnosis_classification='ABUSE OR NEGLECT' or
+            secondary_diagnosis_classification='ABUSE OR NEGLECT' then 1 else 0 end)
+          impute_val: '0'
+        addict_flag:
+          arg: MAX(case when primary_diagnosis_classification='OTHER SUBSTANCE-RELATED
+            OR ADDICTIVE' or secondary_diagnosis_classification='OTHER SUBSTANCE-RELATED
+            OR ADDICTIVE' then 1 else 0 end)
+          impute_val: '0'
+        anxiety_flag:
+          arg: MAX(case when primary_diagnosis_classification='ANXIETY' or secondary_diagnosis_classification='ANXIETY'
+            then 1 else 0 end)
+          impute_val: '0'
+        bipolar_flag:
+          arg: MAX(case when primary_diagnosis_classification='BIPOLAR' or secondary_diagnosis_classification='BIPOLAR'
+            then 1 else 0 end)
+          impute_val: '0'
+        criminal_flag:
+          arg: MAX(case when primary_diagnosis_classification='CRIMINAL' or secondary_diagnosis_classification='CRIMINAL'
+            then 1 else 0 end)
+          impute_val: '0'
+        days_since_last:
+          arg: as_of_date - MAX(admission_date)
+          impute_val: '999999'
+        days_since_last_imp:
+          arg: case when (as_of_date - MAX(admission_date)) is null then 1 else 0
+            end
+          impute_val: '0'
+        days_snc_lst_abuse_neglect:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='ABUSE OR NEGLECT'
+            or secondary_diagnosis_classification='ABUSE OR NEGLECT')
+          impute_val: '999999'
+        days_snc_lst_anxiety:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='ANXIETY' or secondary_diagnosis_classification='ANXIETY')
+          impute_val: '999999'
+        days_snc_lst_bipolar:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='BIPOLAR' or secondary_diagnosis_classification='BIPOLAR')
+          impute_val: '999999'
+        days_snc_lst_criminal:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='CRIMINAL' or secondary_diagnosis_classification='CRIMINAL')
+          impute_val: '999999'
+        days_snc_lst_depr:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='DEPRESSIVE' or secondary_diagnosis_classification='DEPRESSIVE')
+          impute_val: '999999'
+        days_snc_lst_eating:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='FEEDING OR EATING'
+            or secondary_diagnosis_classification='FEEDING OR EATING')
+          impute_val: '999999'
+        days_snc_lst_economic:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='HOUSING OR ECONOMIC'
+            or secondary_diagnosis_classification='HOUSING OR ECONOMIC')
+          impute_val: '999999'
+        days_snc_lst_family:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='OTHER FAMILY' or
+            secondary_diagnosis_classification='OTHER FAMILY')
+          impute_val: '999999'
+        days_snc_lst_gender_dis:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='GENDER DYSPHORIA'
+            or secondary_diagnosis_classification='GENDER DYSPHORIA')
+          impute_val: '999999'
+        days_snc_lst_other_addict:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='OTHER SUBSTANCE-RELATED
+            OR ADDICTIVE' or secondary_diagnosis_classification='OTHER SUBSTANCE-RELATED
+            OR ADDICTIVE')
+          impute_val: '999999'
+        days_snc_lst_other_mh:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='OTHER MENTAL DISORDER'
+            or secondary_diagnosis_classification='OTHER MENTAL DISORDER')
+          impute_val: '999999'
+        days_snc_lst_personality:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='PERSONALITY' or
+            secondary_diagnosis_classification='PERSONALITY')
+          impute_val: '999999'
+        days_snc_lst_psychotic:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='PSYCHOTIC' or secondary_diagnosis_classification='PSYCHOTIC')
+          impute_val: '999999'
+        days_snc_lst_self_harm:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='SUICIDE IDEATION
+            OR SELF-HARM' or secondary_diagnosis_classification='SUICIDE IDEATION
+            OR SELF-HARM')
+          impute_val: '999999'
+        days_snc_lst_subs_use:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='SUBSTANCE-RELATED'
+            or secondary_diagnosis_classification='SUBSTANCE-RELATED')
+          impute_val: '999999'
+        days_snc_lst_trauma:
+          arg: as_of_date - MAX(admission_date)
+          filter: filter (where primary_diagnosis_classification='TRAUMA- OR STRESSOR-
+            RELATED' or secondary_diagnosis_classification='TRAUMA- OR STRESSOR- RELATED')
+          impute_val: '999999'
+        depr_flag:
+          arg: MAX(case when primary_diagnosis_classification='DEPRESSIVE' or secondary_diagnosis_classification='DEPRESSIVE'
+            then 1 else 0 end)
+          impute_val: '0'
+        eating_flag:
+          arg: MAX(case when primary_diagnosis_classification='FEEDING OR EATING'
+            or secondary_diagnosis_classification='FEEDING OR EATING' then 1 else
+            0 end)
+          impute_val: '0'
+        economic_flag:
+          arg: MAX(case when primary_diagnosis_classification='HOUSING OR ECONOMIC'
+            or secondary_diagnosis_classification='HOUSING OR ECONOMIC' then 1 else
+            0 end)
+          impute_val: '0'
+        family_flag:
+          arg: MAX(case when primary_diagnosis_classification='OTHER FAMILY' or secondary_diagnosis_classification='OTHER
+            FAMILY' then 1 else 0 end)
+          impute_val: '0'
+        gender_dis_flag:
+          arg: MAX(case when primary_diagnosis_classification='GENDER DYSPHORIA' or
+            secondary_diagnosis_classification='GENDER DYSPHORIA' then 1 else 0 end)
+          impute_val: '0'
+        other_mh_flag:
+          arg: MAX(case when primary_diagnosis_classification='OTHER MENTAL DISORDER'
+            or secondary_diagnosis_classification='OTHER MENTAL DISORDER' then 1 else
+            0 end)
+          impute_val: '0'
+        personality_flag:
+          arg: MAX(case when primary_diagnosis_classification='PERSONALITY' or secondary_diagnosis_classification='PERSONALITY'
+            then 1 else 0 end)
+          impute_val: '0'
+        psychotic_flag:
+          arg: MAX(case when primary_diagnosis_classification='PSYCHOTIC' or secondary_diagnosis_classification='PSYCHOTIC'
+            then 1 else 0 end)
+          impute_val: '0'
+        self_harm_flag:
+          arg: MAX(case when primary_diagnosis_classification='SUICIDE IDEATION OR
+            SELF-HARM' or secondary_diagnosis_classification='SUICIDE IDEATION OR
+            SELF-HARM' then 1 else 0 end)
+          impute_val: '0'
+        subs_use_flag:
+          arg: MAX(case when primary_diagnosis_classification='SUBSTANCE-RELATED'
+            or secondary_diagnosis_classification='SUBSTANCE-RELATED' then 1 else
+            0 end)
+          impute_val: '0'
+        trauma_flag:
+          arg: MAX(case when primary_diagnosis_classification='TRAUMA- OR STRESSOR-
+            RELATED' or secondary_diagnosis_classification='TRAUMA- OR STRESSOR- RELATED'
+            then 1 else 0 end)
+          impute_val: '0'
+    from_arg: clean.joco110hsccclientmisc2eadiagnosis
+    impute_agg: 0
+    knowledge_date: admission_date
+    table_prefix: hscccdiag
+  joco110hsccclientservice2:
+    county: doco
+    features:
+      agg:
+        clinic_serv:
+          agg_arg: case when servicetype = 'Clinic Services' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 6 months
+          - 12 months
+          - 9999 months
+        comm_corr:
+          agg_arg: case when servicetype = 'Community Corrections' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 6 months
+          - 12 months
+          - 9999 months
+        emergency:
+          agg_arg: case when servicetype = 'Emergency' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 6 months
+          - 12 months
+          - 9999 months
+        parole:
+          agg_arg: case when servicetype = 'Parole' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 6 months
+          - 12 months
+          - 9999 months
+        services_total:
+          agg_arg: case when servicetype is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+      numerical:
+        days_since_last:
+          arg: as_of_date - MAX(event_date)
+          impute_val: '999999'
+        services_flag:
+          arg: MAX(case when event_date is not null then 1 else 0 end)
+          impute_val: '0'
+    from_arg: semi_clean.joco110hsccclientservice2
+    impute_agg: 0
+    knowledge_date: event_date
+    table_prefix: dcservice
+  joco_calls:
+    county: joco
+    features:
+      agg:
+        aggression_calls:
+          agg_arg: case when presenting_issue ilike '%%aggression%%' then 1 else 0
+            end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        anxiety_calls:
+          agg_arg: case when presenting_issue ilike '%%anxiety%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        calls_total:
+          agg_arg: case when event_date is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        cc_calls:
+          agg_arg: case when call_type = 'Care Coordination/Collateral Contact' then
+            1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        cope_calls:
+          agg_arg: case when presenting_issue ilike '%%cope%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        court_ref_calls:
+          agg_arg: case when referral_source ilike '%%court%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        crisis_contact_calls:
+          agg_arg: case when call_type = 'Crisis Contact' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        depression_calls:
+          agg_arg: case when presenting_issue ilike '%%depression%%' then 1 else 0
+            end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        disp_jcmhc:
+          agg_arg: case when disposition ilike '%%jcmhc%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        disp_mcrt:
+          agg_arg: case when disposition ilike '%%mcrt%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        disp_no_action:
+          agg_arg: case when disposition ilike '%%no action%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        disp_no_response:
+          agg_arg: case when disposition ilike '%%no further response%%' then 1 else
+            0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        disp_open_access:
+          agg_arg: case when disposition ilike '%%open access%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        disp_other_agency:
+          agg_arg: case when disposition ilike '%%other agency%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        disp_screening:
+          agg_arg: case when disposition ilike '%%screening%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        family_calls:
+          agg_arg: case when presenting_issue ilike '%%parent-child%%' or presenting_issue
+            ilike '%%family%%' or presenting_issue ilike '%%couple%%' then 1 else
+            0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        family_friends_ref_calls:
+          agg_arg: case when referral_source ilike '%%family%%' or referral_source
+            ilike '%%friends%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        homeless_calls:
+          agg_arg: case when presenting_issue ilike '%%homeless%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        hospital_ref_calls:
+          agg_arg: case when referral_source ilike '%%hospital%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        jdc_ref_calls:
+          agg_arg: case when referral_source = 'JDC' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        legal_issues_calls:
+          agg_arg: case when presenting_issue ilike '%%legal%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        medication_calls:
+          agg_arg: case when presenting_issue ilike '%%medication%%' then 1 else 0
+            end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        mhc_ref_calls:
+          agg_arg: case when referral_source = 'Mental Health Center' then 1 else
+            0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        mood_calls:
+          agg_arg: case when presenting_issue ilike '%%mood%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        oa_triage_calls:
+          agg_arg: case when call_type = 'OA Triage' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        outreach_calls:
+          agg_arg: case when call_type = 'Outreach' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        police_ref_calls:
+          agg_arg: case when referral_source ilike '%%police%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        psychosis_calls:
+          agg_arg: case when presenting_issue ilike '%%psychosis%%' then 1 else 0
+            end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        regular_contact_calls:
+          agg_arg: case when call_type = 'Regular Contact' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        risk_suicidal:
+          agg_arg: case when suicide_homicide_risk ilike '%%suicidal%%' then 1 else
+            0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        risk_to_self:
+          agg_arg: case when risk_to_self_value = 'At Risk' or suicide_homicide_risk
+            ilike '%%harm to self%%' then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        risk_violence:
+          agg_arg: case when suicide_homicide_risk ilike '%%violence%%' or suicide_homicide_risk
+            ilike '%%homicidal%%' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        screening_calls:
+          agg_arg: case when call_type = 'Screening Request' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        self_harm_calls:
+          agg_arg: case when presenting_issue ilike '%%self harm%%' then 1 else 0
+            end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        self_ref_calls:
+          agg_arg: case when referral_source = 'Self' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        site_visit_calls:
+          agg_arg: case when call_type = 'Site Visit' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        substance_use_calls:
+          agg_arg: case when presenting_issue ilike '%%substance abuse%%' then 1 else
+            0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+      numerical:
+        aggression_flag:
+          arg: MAX(case when presenting_issue ilike '%%aggression%%' then 1 else 0
+            end)
+          impute_val: '0'
+        anxiety_flag:
+          arg: MAX(case when presenting_issue ilike '%%anxiety%%' then 1 else 0 end)
+          impute_val: '0'
+        call_flag:
+          arg: MAX(case when event_date is not null then 1 else 0 end)
+          impute_val: '0'
+        calls_total_flag:
+          arg: MAX(case when event_date is not null then 1 else 0 end)
+          impute_val: '0'
+        cc_flag:
+          arg: MAX(case when call_type = 'Care Coordination/Collateral Contact' then
+            1 else 0 end)
+          impute_val: '0'
+        cope_flag:
+          arg: MAX(case when presenting_issue ilike '%%cope%%' then 1 else 0 end)
+          impute_val: '0'
+        court_ref_flag:
+          arg: MAX(case when referral_source ilike '%%court%%' then 1 else 0 end)
+          impute_val: '0'
+        crisis_contact_flag:
+          arg: MAX(case when call_type = 'Crisis Contact' then 1 else 0 end)
+          impute_val: '0'
+        days_since_last:
+          arg: as_of_date - MAX(event_date)
+          impute_val: '999999'
+        days_snc_lst_agress_call:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where presenting_issue ilike '%%aggression%%')
+          impute_val: '999999'
+        days_snc_lst_anxiety_call:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where presenting_issue ilike '%%anxiety%%')
+          impute_val: '999999'
+        days_snc_lst_cc_calls:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where call_type = 'Care Coordination/Collateral Contact')
+          impute_val: '999999'
+        days_snc_lst_cope_call:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where presenting_issue ilike '%%cope%%')
+          impute_val: '999999'
+        days_snc_lst_court_ref:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where referral_source ilike '%%court%%')
+          impute_val: '999999'
+        days_snc_lst_crisis_calls:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where call_type = 'Crisis Contact')
+          impute_val: '999999'
+        days_snc_lst_depr_call:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where presenting_issue ilike '%%depression%%')
+          impute_val: '999999'
+        days_snc_lst_disp_jcmhc:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where disposition ilike '%%jcmhc%%')
+          impute_val: '999999'
+        days_snc_lst_disp_mcrt:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where disposition ilike '%%mcrt%%')
+          impute_val: '999999'
+        days_snc_lst_disp_no_action:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where disposition ilike '%%no action%%')
+          impute_val: '999999'
+        days_snc_lst_disp_no_resp:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where disposition ilike '%%no further response%%')
+          impute_val: '999999'
+        days_snc_lst_disp_open_access:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where disposition ilike '%%open access%%')
+          impute_val: '999999'
+        days_snc_lst_disp_other_agency:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where disposition ilike '%%other agency%%')
+          impute_val: '999999'
+        days_snc_lst_disp_screening:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where disposition ilike '%%screening%%')
+          impute_val: '999999'
+        days_snc_lst_family_friends_ref:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where referral_source ilike '%%family%%' or referral_source
+            ilike '%%friends%%' or referral_source ilike '%%employer%%')
+          impute_val: '999999'
+        days_snc_lst_homeless_call:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where presenting_issue ilike '%%homeless%%')
+          impute_val: '999999'
+        days_snc_lst_hospital_ref:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where referral_source ilike '%%hospital%%')
+          impute_val: '999999'
+        days_snc_lst_jdc_ref:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where referral_source = 'JDC')
+          impute_val: '999999'
+        days_snc_lst_legal_call:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where presenting_issue ilike '%%legal%%')
+          impute_val: '999999'
+        days_snc_lst_medication_call:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where presenting_issue ilike '%%medication%%')
+          impute_val: '999999'
+        days_snc_lst_mhc_ref:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where referral_source = 'Mental Health Center')
+          impute_val: '999999'
+        days_snc_lst_mood_call:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where presenting_issue ilike '%%mood%%')
+          impute_val: '999999'
+        days_snc_lst_oa_triage_calls:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where call_type = 'OA Triage')
+          impute_val: '999999'
+        days_snc_lst_outreach_calls:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where call_type = 'Outreach')
+          impute_val: '999999'
+        days_snc_lst_police_ref:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where referral_source ilike '%%police%%')
+          impute_val: '999999'
+        days_snc_lst_psychosis_call:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where presenting_issue ilike '%%psychosis%%')
+          impute_val: '999999'
+        days_snc_lst_regular_calls:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where call_type = 'Regular Contact')
+          impute_val: '999999'
+        days_snc_lst_risk_self_call:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where risk_to_self_value = 'At Risk' or suicide_homicide_risk
+            ilike '%%harm to self%%')
+          impute_val: '999999'
+        days_snc_lst_risk_suicidal:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where suicide_homicide_risk ilike '%%suicidal%%')
+          impute_val: '999999'
+        days_snc_lst_risk_violence:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where suicide_homicide_risk ilike '%%violence%%' or suicide_homicide_risk
+            ilike '%%homicidal%%')
+          impute_val: '999999'
+        days_snc_lst_screening_calls:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where call_type = 'Screening Request')
+          impute_val: '999999'
+        days_snc_lst_self_harm_call:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where presenting_issue ilike '%%self harm%%')
+          impute_val: '999999'
+        days_snc_lst_self_ref:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where referral_source = 'Self')
+          impute_val: '999999'
+        days_snc_lst_site_visit_calls:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where call_type = 'Site Visit')
+          impute_val: '999999'
+        days_snc_lst_substance_use_call:
+          arg: as_of_date - MAX(event_date)
+          filter: filter (where presenting_issue ilike '%%parent-child%%' or presenting_issue
+            ilike '%%family%%' or presenting_issue ilike '%%couple%%')
+          impute_val: '999999'
+        depression_flag:
+          arg: MAX(case when presenting_issue ilike '%%depression%%' then 1 else 0
+            end)
+          impute_val: '0'
+        disp_jcmhc_flag:
+          arg: MAX(case when disposition ilike '%%jcmhc%%' then 1 else 0 end)
+          impute_val: '0'
+        disp_mcrt_flag:
+          arg: MAX(case when disposition ilike '%%mcrt%%' then 1 else 0 end)
+          impute_val: '0'
+        disp_no_action_flag:
+          arg: MAX(case when disposition ilike '%%no action%%' then 1 else 0 end)
+          impute_val: '0'
+        disp_no_response_flag:
+          arg: MAX(case when disposition ilike '%%no further response%%' then 1 else
+            0 end)
+          impute_val: '0'
+        disp_open_access_flag:
+          arg: MAX(case when disposition ilike '%%open access%%' then 1 else 0 end)
+          impute_val: '0'
+        disp_other_agency_flag:
+          arg: MAX(case when disposition ilike '%%other agency%%' then 1 else 0 end)
+          impute_val: '0'
+        disp_screening_flag:
+          arg: MAX(case when disposition ilike '%%screening%%' then 1 else 0 end)
+          impute_val: '0'
+        family_flag:
+          arg: MAX(case when presenting_issue ilike '%%parent-child%%' or presenting_issue
+            ilike '%%family%%' or presenting_issue ilike '%%couple%%' then 1 else
+            0 end)
+          impute_val: '0'
+        family_friends_flag:
+          arg: MAX(case when referral_source ilike '%%family%%' or referral_source
+            ilike '%%friends%%' then 1 else 0 end)
+          impute_val: '0'
+        homeless_flag:
+          arg: MAX(case when presenting_issue ilike '%%homeless%%' then 1 else 0 end)
+          impute_val: '0'
+        hospital_ref_flag:
+          arg: MAX(case when referral_source ilike '%%hospital%%' then 1 else 0 end)
+          impute_val: '0'
+        jdc_ref_flag:
+          arg: MAX(case when referral_source = 'JDC' then 1 else 0 end)
+          impute_val: '0'
+        legal_issues_flag:
+          arg: MAX(case when presenting_issue ilike '%%legal%%' then 1 else 0 end)
+          impute_val: '0'
+        medication_flag:
+          arg: MAX(case when presenting_issue ilike '%%medication%%' then 1 else 0
+            end)
+          impute_val: '0'
+        mhc_ref_flag:
+          arg: MAX(case when referral_source = 'Mental Health Center' then 1 else
+            0 end)
+          impute_val: '0'
+        mood_flag:
+          arg: MAX(case when presenting_issue ilike '%%mood%%' then 1 else 0 end)
+          impute_val: '0'
+        oa_triage_flag:
+          arg: MAX(case when call_type = 'OA Triage' then 1 else 0 end)
+          impute_val: '0'
+        outreach_flag:
+          arg: MAX(case when call_type = 'Outreach' then 1 else 0 end)
+          impute_val: '0'
+        police_ref_flag:
+          arg: MAX(case when referral_source ilike '%%police%%' then 1 else 0 end)
+          impute_val: '0'
+        psychosis_flag:
+          arg: MAX(case when presenting_issue ilike '%%psychosis%%' then 1 else 0
+            end)
+          impute_val: '0'
+        regular_contact_flag:
+          arg: MAX(case when call_type = 'Regular Contact' then 1 else 0 end)
+          impute_val: '0'
+        risk_suicidal_flag:
+          arg: MAX(case when suicide_homicide_risk ilike '%%suicidal%%' then 1 else
+            0 end)
+          impute_val: '0'
+        risk_to_self_flag:
+          arg: MAX(case when risk_to_self_value = 'At Risk' or suicide_homicide_risk
+            ilike '%%harm to self%%' then 1 else 0 end)
+          impute_val: '0'
+        risk_violence_flag:
+          agg_func:
+          - MAX
+          arg: MAX(case when suicide_homicide_risk ilike '%%violence%%' or suicide_homicide_risk
+            ilike '%%homicidal%%' then 1 else 0 end)
+          impute_val: '0'
+        screening_flag:
+          arg: MAX(case when call_type = 'Screening Request' then 1 else 0 end)
+          impute_val: '0'
+        self_harm_flag:
+          arg: MAX(case when presenting_issue ilike '%%self harm%%' then 1 else 0
+            end)
+          impute_val: '0'
+        self_ref_flag:
+          arg: MAX(case when referral_source = 'Self' then 1 else 0 end)
+          impute_val: '0'
+        site_visit_flag:
+          arg: MAX(case when call_type = 'Site Visit' then 1 else 0 end)
+          impute_val: '0'
+        substance_use_flag:
+          arg: MAX(case when presenting_issue ilike '%%substance abuse%%' then 1 else
+            0 end)
+          impute_val: '0'
+    from_arg: semantic.joco_calls
+    impute_agg: 0
+    knowledge_date: event_date
+    table_prefix: jococalls
+  jocojcmhcadmissions:
+    county: joco
+    features:
+      agg:
+        prog_emerg_services:
+          add_filter: and program_category = 'EMERGENCY SERVICES'
+          agg_arg: case when program_desc is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 3 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        prog_gambling:
+          add_filter: and program_category = 'GAMBLING'
+          agg_arg: case when program_desc is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 3 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        prog_mental_health:
+          add_filter: and program_category = 'MENTAL HEALTH'
+          agg_arg: case when program_desc is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 3 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        prog_sex_abuse:
+          add_filter: and program_category = 'SEXUAL ABUSE'
+          agg_arg: case when program_desc is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 3 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        prog_subs_abuse:
+          add_filter: and program_category = 'SUBSTANCE ABUSE'
+          agg_arg: case when program_desc is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 3 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        prog_total:
+          agg_arg: case when program_desc is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 3 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        prog_youth_treat:
+          add_filter: and program_category = 'YOUTH TREATMENT'
+          agg_arg: case when program_desc is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 3 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+      numerical:
+        days_since_last:
+          arg: as_of_date - MAX(admit_date)
+          impute_val: '999999'
+        days_since_last_imp:
+          arg: case when (as_of_date - MAX(admit_date)) is null then 1 else 0 end
+          impute_val: '0'
+        days_snc_lst_emergency_srvcs:
+          arg: as_of_date - MAX(admit_date)
+          filter: filter (where program_category='EMERGENCY SERVICES')
+          impute_val: '999999'
+        days_snc_lst_mental_health:
+          arg: as_of_date - MAX(admit_date)
+          filter: filter (where program_category='MENTAL HEALTH')
+          impute_val: '999999'
+        days_snc_lst_sex_abuse:
+          arg: as_of_date - MAX(admit_date)
+          filter: filter (where program_category='SEXUAL ABUSE')
+          impute_val: '999999'
+        days_snc_lst_subs_abuse:
+          arg: as_of_date - MAX(admit_date)
+          filter: filter (where program_category='SUBSTANCE ABUSE')
+          impute_val: '999999'
+        days_snc_lst_youth_treatmnt:
+          arg: as_of_date - MAX(admit_date)
+          filter: filter (where program_category='YOUTH TREATMENT')
+          impute_val: '999999'
+        emergency_srvcs_flag:
+          arg: MAX(case when program_category='EMERGENCY SERVICES' then 1 else 0 end)
+          impute_val: '0'
+        mental_health_flag:
+          arg: MAX(case when program_category='MENTAL HEALTH' then 1 else 0 end)
+          impute_val: '0'
+        sex_abuse_flag:
+          arg: MAX(case when program_category='SEXUAL ABUSE' then 1 else 0 end)
+          impute_val: '0'
+        subs_abuse_flag:
+          arg: MAX(case when program_category='SUBSTANCE ABUSE' then 1 else 0 end)
+          impute_val: '0'
+        youth_treatment_flag:
+          arg: MAX(case when program_category='YOUTH TREATMENT' then 1 else 0 end)
+          impute_val: '0'
+    from_arg: clean.jocojcmhcadmissions
+    impute_agg: 0
+    knowledge_date: admit_date
+    table_prefix: mhcadmiss
+  jocojcmhccsassessments20172022:
+    county: joco
+    features:
+      agg:
+        abort_attmpt_3m:
+          agg_arg: case when aborted_attempt_3m then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        abort_attmpt_lt:
+          agg_arg: case when aborted_attempt_lifetime then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        actual_attmpt_3m:
+          agg_arg: case when actual_attempt_3m then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        actual_attmpt_lt:
+          agg_arg: case when actual_attempt_lifetime then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        inter_attmpt_3m:
+          agg_arg: case when interupt_attempt_3m then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        inter_attmpt_lt:
+          agg_arg: case when interupt_attempt_lifetime then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        nonsuic_self_harm_3m:
+          agg_arg: case when nonsuicidal_self_harm_3m then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        nonsuic_self_harm_lt:
+          agg_arg: case when nonsuicidal_self_harm_lifetime then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        prep_behav_3m:
+          agg_arg: case when prep_behavior_3m then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        prep_behav_lt:
+          agg_arg: case when prep_behavior_lifetime then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        q1_1m:
+          agg_arg: case when q1_pastmonth then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        q1_lt:
+          agg_arg: case when q1_lifetime then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        q2_1m:
+          agg_arg: case when q2_pastmonth then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        q2_lt:
+          agg_arg: case when q2_lifetime then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        q3_1m:
+          agg_arg: case when q3_pastmonth then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        q3_lt:
+          agg_arg: case when q3_lifetime then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        q4_1m:
+          agg_arg: case when q4_pastmonth then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        q4_lt:
+          agg_arg: case when q4_lifetime then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        q5_1m:
+          agg_arg: case when q5_pastmonth then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        q5_lt:
+          agg_arg: case when q5_lifetime then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        suic_dur_1m:
+          agg_arg: suic_duration_freq_pastmonth
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        suic_dur_lt:
+          agg_arg: suic_duration_freq_lifetime
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        suic_thought_1m:
+          agg_arg: suic_thought_freq_pastmonth
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        suic_thought_lt:
+          agg_arg: suic_thought_freq_lifetime
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+      numerical:
+        assessment_flag:
+          arg: MAX(case when assessment_date is not null then 1 else 0 end)
+          impute_val: '0'
+        days_since_last:
+          arg: as_of_date - MAX(assessment_date)
+          impute_val: '999999'
+    from_arg: clean.jocojcmhccsassessments20172022
+    impute_agg: 0
+    knowledge_date: assessment_date
+    table_prefix: mhcassess
+  jocojcmhcdiagnoses:
+    county: joco
+    features:
+      agg:
+        diag_abuse:
+          agg_arg: case when diagnosis_classification='ABUSE OR NEGLECT' then 1 else
+            0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_anxiety:
+          agg_arg: case when diagnosis_classification='ANXIETY' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_bipolar:
+          agg_arg: case when diagnosis_classification='BIPOLAR' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_criminal:
+          agg_arg: case when diagnosis_classification='CRIMINAL' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_depress:
+          agg_arg: case when diagnosis_classification='DEPRESSIVE' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_eating:
+          agg_arg: case when diagnosis_classification='FEEDING OR EATING' then 1 else
+            0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_economic:
+          agg_arg: case when diagnosis_classification='HOUSING OR ECONOMIC' then 1
+            else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_family:
+          agg_arg: case when diagnosis_classification='OTHER FAMILY' then 1 else 0
+            end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_gender_dis:
+          agg_arg: case when diagnosis_classification='GENDER DYSPHORIA' then 1 else
+            0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_other_addict:
+          agg_arg: case when diagnosis_classification='OTHER SUBSTANCE-RELATED OR
+            ADDICTIVE' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_other_mh:
+          agg_arg: case when diagnosis_classification='OTHER MENTAL DISORDER' then
+            1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_personal:
+          agg_arg: case when diagnosis_classification='PERSONALITY' then 1 else 0
+            end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_psychotic:
+          agg_arg: case when diagnosis_classification='PSYCHOTIC' then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_ptsd:
+          agg_arg: case when diagnosis_classification='TRAUMA- OR STRESSOR- RELATED'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_self_harm:
+          agg_arg: case when diagnosis_classification='SUICIDE IDEATION OR SELF-HARM'
+            then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_substance:
+          agg_arg: case when diagnosis_classification='SUBSTANCE-RELATED' then 1 else
+            0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+        diag_total:
+          agg_arg: case when diagnosis_classification is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 7 days
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+      numerical:
+        abuse_neglect_flag:
+          arg: MAX(case when diagnosis_classification='ABUSE OR NEGLECT' then 1 else
+            0 end)
+          impute_val: '0'
+        anxiety_flag:
+          arg: MAX(case when diagnosis_classification='ANXIETY' then 1 else 0 end)
+          impute_val: '0'
+        bipolar_flag:
+          arg: MAX(case when diagnosis_classification='BIPOLAR' then 1 else 0 end)
+          impute_val: '0'
+        criminal_flag:
+          arg: MAX(case when diagnosis_classification='CRIMINAL' then 1 else 0 end)
+          impute_val: '0'
+        days_since_last:
+          arg: as_of_date - MAX(dx_date)
+          impute_val: '999999'
+        days_since_last_imp:
+          arg: case when (as_of_date - MAX(dx_date)) is null then 1 else 0 end
+          impute_val: '0'
+        days_snc_lst_abuse_neglect:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='ABUSE OR NEGLECT')
+          impute_val: '999999'
+        days_snc_lst_anxiety:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='ANXIETY')
+          impute_val: '999999'
+        days_snc_lst_bipolar:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='BIPOLAR')
+          impute_val: '999999'
+        days_snc_lst_criminal:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='CRIMINAL')
+          impute_val: '999999'
+        days_snc_lst_depr:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='DEPRESSIVE')
+          impute_val: '999999'
+        days_snc_lst_eating:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='FEEDING OR EATING')
+          impute_val: '999999'
+        days_snc_lst_economic:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='HOUSING OR ECONOMIC')
+          impute_val: '999999'
+        days_snc_lst_family:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='OTHER FAMILY')
+          impute_val: '999999'
+        days_snc_lst_gender_dis:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='GENDER DYSPHORIA')
+          impute_val: '999999'
+        days_snc_lst_other_addict:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='OTHER SUBSTANCE-RELATED
+            OR ADDICTIVE')
+          impute_val: '999999'
+        days_snc_lst_other_mh:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='OTHER MENTAL DISORDER')
+          impute_val: '999999'
+        days_snc_lst_personality:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='PERSONALITY')
+          impute_val: '999999'
+        days_snc_lst_psychotic:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='PSYCHOTIC')
+          impute_val: '999999'
+        days_snc_lst_self_harm:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='SUICIDE IDEATION OR SELF-HARM')
+          impute_val: '999999'
+        days_snc_lst_subs_use:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='SUBSTANCE-RELATED')
+          impute_val: '999999'
+        days_snc_lst_trauma:
+          arg: as_of_date - MAX(dx_date)
+          filter: filter (where diagnosis_classification='TRAUMA- OR STRESSOR- RELATED')
+          impute_val: '999999'
+        depr_flag:
+          arg: MAX(case when diagnosis_classification='DEPRESSIVE' then 1 else 0 end)
+          impute_val: '0'
+        eating_flag:
+          arg: MAX(case when diagnosis_classification='FEEDING OR EATING' then 1 else
+            0 end)
+          impute_val: '0'
+        economic_flag:
+          arg: MAX(case when diagnosis_classification='HOUSING OR ECONOMIC' then 1
+            else 0 end)
+          impute_val: '0'
+        family_flag:
+          arg: MAX(case when diagnosis_classification='OTHER FAMILY' then 1 else 0
+            end)
+          impute_val: '0'
+        gender_dis_flag:
+          arg: MAX(case when diagnosis_classification='GENDER DYSPHORIA' then 1 else
+            0 end)
+          impute_val: '0'
+        other_addict_flag:
+          arg: MAX(case when diagnosis_classification='OTHER SUBSTANCE-RELATED OR
+            ADDICTIVE' then 1 else 0 end)
+          impute_val: '0'
+        other_mh_flag:
+          arg: MAX(case when diagnosis_classification='OTHER MENTAL DISORDER' then
+            1 else 0 end)
+          impute_val: '0'
+        personality_flag:
+          arg: MAX(case when diagnosis_classification='PERSONALITY' then 1 else 0
+            end)
+          impute_val: '0'
+        psychotic_flag:
+          arg: MAX(case when diagnosis_classification='PSYCHOTIC' then 1 else 0 end)
+          impute_val: '0'
+        self_harm_flag:
+          arg: MAX(case when diagnosis_classification='SUICIDE IDEATION OR SELF-HARM'
+            then 1 else 0 end)
+          impute_val: '0'
+        subs_use_flag:
+          arg: MAX(case when diagnosis_classification='SUBSTANCE-RELATED' then 1 else
+            0 end)
+          impute_val: '0'
+        trauma_flag:
+          arg: MAX(case when diagnosis_classification='TRAUMA- OR STRESSOR- RELATED'
+            then 1 else 0 end)
+          impute_val: '0'
+    from_arg: clean.jocojcmhcdiagnoses
+    impute_agg: 0
+    knowledge_date: dx_date
+    table_prefix: mhcdiag
+  jocojcmhcdischarges:
+    county: joco
+    features:
+      agg:
+        prog_total:
+          add_filter: and dschg_reason = 'DROPPED OUT'
+          agg_arg: case when program_desc is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 3 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+      numerical:
+        days_since_last:
+          arg: as_of_date - MAX(dschg_date)
+          impute_val: '999999'
+        discharges_flag:
+          arg: MAX(case when dschg_date is not null then 1 else 0 end)
+          impute_val: '0'
+    from_arg: clean.jocojcmhcdischarges
+    impute_agg: 0
+    knowledge_date: dschg_date
+    table_prefix: mhcdischg
+  jocojcmhcservices:
+    county: joco
+    features:
+      agg:
+        outreach_total:
+          add_filter: and service_desc = 'OUTREACH SERVICES'
+          agg_arg: case when service_code is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        services_total:
+          agg_arg: case when service_code is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+      numerical:
+        days_since_last:
+          arg: as_of_date - MAX(service_date)
+          impute_val: '999999'
+        services_flag:
+          arg: MAX(case when service_date is not null then 1 else 0 end)
+          impute_val: '0'
+    from_arg: clean.jocojcmhcservices
+    impute_agg: 0
+    knowledge_date: service_date
+    table_prefix: mhcserv
+  jocojimscasecharges:
+    county: joco
+    features:
+      agg:
+        charges_total:
+          agg_arg: case when event_date is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 6 months
+          - 12 months
+          - 9999 months
+      numerical:
+        casecharges_flag:
+          arg: MAX(case when event_date is not null then 1 else 0 end)
+          impute_val: '0'
+        days_since_last:
+          arg: as_of_date - MAX(event_date)
+          impute_val: '999999'
+    from_arg: semi_clean.jocojimscasecharges
+    impute_agg: 0
+    knowledge_date: event_date
+    table_prefix: jimscharges
+  jocojimscasehearings:
+    county: joco
+    features:
+      agg:
+        charges_total:
+          agg_arg: case when event_date is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 6 months
+          - 12 months
+          - 9999 months
+      numerical:
+        days_since_last:
+          arg: as_of_date - MAX(event_date)
+          impute_val: '999999'
+        hearings_flag:
+          arg: MAX(case when event_date is not null then 1 else 0 end)
+          impute_val: '0'
+    from_arg: semi_clean.jocojimswarranthstdata
+    impute_agg: 0
+    knowledge_date: event_date
+    table_prefix: jocojimswarranthstdata
+  jocojimsjuvinmatedata:
+    county: joco
+    features:
+      agg:
+        jail_books_total:
+          agg_arg: case when event_date is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+        jail_days:
+          add_filter: and rel_date_88 is not null and rel_date_88 <> '' and bk_dt_40
+            is not null and bk_dt_40 <> ''
+          agg_arg: rel_date_88::date - bk_dt_40::date
+          agg_func:
+          - SUM
+          intervals:
+          - 14 days
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 24 months
+          - 60 months
+          - 9999 months
+        juvin_inmate:
+          agg_arg: case when event_date is not null then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 9999 months
+    from_arg: semi_clean.jocojimsjuvinmatedata
+    impute_agg: 0
+    knowledge_date: event_date
+    table_prefix: jimsjuvin
+  jocojimsmnhdata:
+    county: joco
+    features:
+      agg:
+        bookings_total:
+          agg_arg: case when book_date is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 3 months
+          - 12 months
+          - 24 months
+          - 36 months
+          - 9999 months
+      numerical:
+        days_since_last:
+          arg: as_of_date - MAX(book_date)
+          impute_val: '999999'
+        mnh_flag:
+          arg: MAX(case when book_date is not null then 1 else 0 end)
+          impute_val: '0'
+    from_arg: clean.jocojimsmnhdata
+    impute_agg: 0
+    knowledge_date: book_date
+    table_prefix: jimnsmnh
+  jocojimsproscharges:
+    county: joco
+    features:
+      agg:
+        charges_total:
+          agg_arg: case when event_date is not null then 1 else 0 end
+          agg_func:
+          - SUM
+          intervals:
+          - 1 month
+          - 6 months
+          - 12 months
+          - 9999 months
+      numerical:
+        days_since_last:
+          arg: as_of_date - MAX(event_date)
+          impute_val: '999999'
+        proscharges_flag:
+          arg: MAX(case when event_date is not null then 1 else 0 end)
+          impute_val: '0'
+    from_arg: semi_clean.jocojimsproscharges
+    impute_agg: 0
+    knowledge_date: event_date
+    table_prefix: jimsproschrg
+  jocomedactincidents:
+    county: joco
+    features:
+      agg:
+        amb_homeless:
+          agg_arg: case when homeless then 1 else 0 end
+          agg_func:
+          - MAX
+          intervals:
+          - 1 month
+          - 3 months
+          - 6 months
+          - 12 months
+          - 36 months
+          - 9999 months
+      numerical:
+        days_since_last:
+          arg: as_of_date - MAX(incident_date)
+          filter: filter (where homeless)
+          impute_val: '999999'
+    from_arg: clean.jocomedactincidents
+    impute_agg: 0
+    knowledge_date: incident_date
+    table_prefix: jocomedact
+labels:
+  definitions:
+    label1:
+      combination_query: 'select * from dc_suic
+
+        union
+
+        select * from jc_suic
+
+        '
+      cte_expression: "dc_suic as (\n    select joid, true as label\n    from clean.jocodcmexoverdosessuicides\
+        \ mex\n    where (mex.dateofdeath < ('{as_of_date}'::date + interval '{months_future}\
+        \ months')\n            and mex.dateofdeath > '{as_of_date}'::date)\n    \
+        \        and mex.suicide\n),\njc_suic as (\n    select joid, true as label\n\
+        \    from clean.jocojcmexoverdosessuicides mex\n    where (mex.dateofdeath\
+        \ < ('{as_of_date}'::date + interval '{months_future} months')\n         \
+        \   and mex.dateofdeath > '{as_of_date}'::date)\n            and mex.suicide\n\
+        )\n"
+      label_name: DEATH BY SUICIDE
+    label10:
+      combination_query: 'select * from dc_diag9
+
+        union
+
+        select * from jc_diag9
+
+        '
+      cte_expression: "dc_diag9 as (\n    select joid, true as label\n    from clean.joco110hsccclientmisc2eadiagnosis\
+        \ hscc_diag\n    where (hscc_diag.admission_date < ('{as_of_date}'::date +\
+        \ interval '{months_future} months')\n            and hscc_diag.admission_date\
+        \ > '{as_of_date}'::date)\n            and (hscc_diag.primary_diagnosis_classification\
+        \ = 'PSYCHOTIC'\n              or hscc_diag.secondary_diagnosis_classification\
+        \ = 'PSYCHOTIC')\n),\njc_diag9 as (\n    select joid, true as label\n    from\
+        \ clean.jocojcmhcdiagnoses mhc\n    where (mhc.dx_date < ('{as_of_date}'::date\
+        \ + interval '{months_future} months')\n            and mhc.dx_date > '{as_of_date}'::date)\n\
+        \            and mhc.diagnosis_classification = 'PSYCHOTIC'\n)\n"
+      label_name: PSYCHOSIS DIAGNOSIS
+    label11:
+      combination_query: 'select * from dc_hosp_diag11
+
+        '
+      cte_expression: "dc_hosp_diag11 as (\n  select joid, true as label\n  from clean.joco110hsccclientmisc2eadiagnosis\
+        \ hscc_diag\n  where (hscc_diag.admission_date < ('{as_of_date}'::date + interval\
+        \ '{months_future} months')\n    and hscc_diag.admission_date > '{as_of_date}'::date)\n\
+        \    and suicide_attempt_flag\n)\n"
+      label_name: DOCO SUICIDE ATTEMPT DIAGNOSIS
+    label12:
+      combination_query: 'select * from dc_hosp_diag12
+
+        '
+      cte_expression: "dc_hosp_diag12 as (\n  select joid, true as label\n  from clean.joco110hsccclientmisc2eadiagnosis\
+        \ hscc_diag\n  where (hscc_diag.admission_date < ('{as_of_date}'::date + interval\
+        \ '{months_future} months')\n    and hscc_diag.admission_date > '{as_of_date}'::date)\n\
+        \    and suicidal_flag\n)\n"
+      label_name: DOCO SUICIDAL DIAGNOSIS
+    label13:
+      combination_query: 'select * from dc_hosp_diag13
+
+        '
+      cte_expression: "dc_hosp_diag13 as (\n  select joid, true as label\n  from clean.joco110hsccclientmisc2eadiagnosis\
+        \ hscc_diag\n  where (hscc_diag.admission_date < ('{as_of_date}'::date + interval\
+        \ '{months_future} months')\n    and hscc_diag.admission_date > '{as_of_date}'::date)\n\
+        \    and drug_flag\n)\n"
+      label_name: DOCO DRUG DIAGNOSIS
+    label14:
+      combination_query: 'select * from dc_hosp_diag14
+
+        '
+      cte_expression: "dc_hosp_diag14 as (\n  select joid, true as label\n  from clean.joco110hsccclientmisc2eadiagnosis\
+        \ hscc_diag\n  where (hscc_diag.admission_date < ('{as_of_date}'::date + interval\
+        \ '{months_future} months')\n    and hscc_diag.admission_date > '{as_of_date}'::date)\n\
+        \    and other_mental_crisis_flag\n)\n"
+      label_name: DOCO OTHER MENTAL CRISIS DIAGNOSIS
+    label2:
+      combination_query: 'select * from dc_overd
+
+        union
+
+        select * from jc_overd
+
+        '
+      cte_expression: "dc_overd as (\n    select joid, true as label\n    from clean.jocodcmexoverdosessuicides\
+        \ mex\n    where (mex.dateofdeath < ('{as_of_date}'::date + interval '{months_future}\
+        \ months')\n            and mex.dateofdeath > '{as_of_date}'::date)\n    \
+        \        and mex.overdosed\n),\njc_overd as (\n    select joid, true as label\n\
+        \    from clean.jocojcmexoverdosessuicides mex\n    where (mex.dateofdeath\
+        \ < ('{as_of_date}'::date + interval '{months_future} months')\n         \
+        \   and mex.dateofdeath > '{as_of_date}'::date)\n            and mex.overdosed\n\
+        )\n"
+      label_name: DEATH BY OVERDOSE
+    label3:
+      combination_query: 'select * from dc_med2
+
+        union
+
+        select * from jc_med2
+
+        '
+      cte_expression: "dc_med2 as (\n    select joid, true as label\n    from clean.jocomedactincidents\
+        \ med\n    where (med.incident_date < ('{as_of_date}'::date + interval '{months_future}\
+        \ months')\n            and med.incident_date > '{as_of_date}'::date)\n  \
+        \          and med.suicide_attempt_flag\n),\njc_med2 as (\n    select joid,\
+        \ true as label\n    from clean.joco110hsccclientmisc2eaimpression med\n \
+        \   where (med.incident_date < ('{as_of_date}'::date + interval '{months_future}\
+        \ months')\n            and med.incident_date > '{as_of_date}'::date)\n  \
+        \          and med.suicide_attempt_flag\n)\n"
+      label_name: SUICIDE ATTEMPT AMBULANCE RUN
+    label4:
+      combination_query: 'select * from dc_med3
+
+        union
+
+        select * from jc_med3
+
+        '
+      cte_expression: "dc_med3 as (\n    select joid, true as label\n    from clean.jocomedactincidents\
+        \ med\n    where (med.incident_date < ('{as_of_date}'::date + interval '{months_future}\
+        \ months')\n            and med.incident_date > '{as_of_date}'::date)\n  \
+        \          and med.suicidal_flag\n),\njc_med3 as (\n    select joid, true\
+        \ as label\n    from clean.joco110hsccclientmisc2eaimpression med\n    where\
+        \ (med.incident_date < ('{as_of_date}'::date + interval '{months_future} months')\n\
+        \            and med.incident_date > '{as_of_date}'::date)\n            and\
+        \ med.suicidal_flag\n)\n"
+      label_name: SUICIDAL AMBULANCE RUN
+    label5:
+      combination_query: 'select * from dc_med4
+
+        union
+
+        select * from jc_med4
+
+        '
+      cte_expression: "dc_med4 as (\n    select joid, true as label\n    from clean.jocomedactincidents\
+        \ med\n    where (med.incident_date < ('{as_of_date}'::date + interval '{months_future}\
+        \ months')\n            and med.incident_date > '{as_of_date}'::date)\n  \
+        \          and med.drug_flag\n),\njc_med4 as (\n    select joid, true as label\n\
+        \    from clean.joco110hsccclientmisc2eaimpression med\n    where (med.incident_date\
+        \ < ('{as_of_date}'::date + interval '{months_future} months')\n         \
+        \   and med.incident_date > '{as_of_date}'::date)\n            and med.drug_flag\n\
+        )\n"
+      label_name: SUBSTANCE USE AMBULANCE RUN
+    label6:
+      combination_query: 'select * from dc_med5
+
+        union
+
+        select * from jc_med5
+
+        '
+      cte_expression: "dc_med5 as (\n    select joid, true as label\n    from clean.jocomedactincidents\
+        \ med\n    where (med.incident_date < ('{as_of_date}'::date + interval '{months_future}\
+        \ months')\n            and med.incident_date > '{as_of_date}'::date)\n  \
+        \          and med.other_mental_crisis_flag\n),\njc_med5 as (\n    select\
+        \ joid, true as label\n    from clean.joco110hsccclientmisc2eaimpression med\n\
+        \    where (med.incident_date < ('{as_of_date}'::date + interval '{months_future}\
+        \ months')\n            and med.incident_date > '{as_of_date}'::date)\n  \
+        \          and med.other_mental_crisis_flag\n)\n"
+      label_name: OTHER BEHAVIORAL CRISIS AMBULANCE RUN
+    label7:
+      combination_query: 'select * from dc_med6
+
+        union
+
+        select * from jc_med6
+
+        '
+      cte_expression: "dc_med6 as (\n    select joid, true as label\n    from clean.jocomedactincidents\
+        \ med\n    where (med.incident_date < ('{as_of_date}'::date + interval '{months_future}\
+        \ months')\n            and med.incident_date > '{as_of_date}'::date)\n  \
+        \          and med.alcohol_flag\n),\njc_med6 as (\n    select joid, true as\
+        \ label\n    from clean.joco110hsccclientmisc2eaimpression med\n    where\
+        \ (med.incident_date < ('{as_of_date}'::date + interval '{months_future} months')\n\
+        \            and med.incident_date > '{as_of_date}'::date)\n            and\
+        \ med.alcohol_flag\n)\n"
+      label_name: ALCOHOL RELATED AMBULANCE RUN
+    label8:
+      combination_query: 'select * from dc_diag7
+
+        union
+
+        select * from jc_diag7
+
+        '
+      cte_expression: "dc_diag7 as (\n    select joid, true as label\n    from clean.joco110hsccclientmisc2eadiagnosis\
+        \ hscc_diag\n    where (hscc_diag.admission_date < ('{as_of_date}'::date +\
+        \ interval '{months_future} months')\n            and hscc_diag.admission_date\
+        \ > '{as_of_date}'::date)\n            and (hscc_diag.primary_diagnosis_classification\
+        \ = 'SUICIDE IDEATION OR SELF-HARM'\n              or hscc_diag.secondary_diagnosis_classification\
+        \ = 'SUICIDE IDEATION OR SELF-HARM')\n),\njc_diag7 as (\n    select joid,\
+        \ true as label\n    from clean.jocojcmhcdiagnoses mhc\n    where (mhc.dx_date\
+        \ < ('{as_of_date}'::date + interval '{months_future} months')\n         \
+        \   and mhc.dx_date > '{as_of_date}'::date)\n            and mhc.diagnosis_classification\
+        \ = 'SUICIDE IDEATION OR SELF-HARM'\n)\n"
+      label_name: SUICIDAL DIAGNOSIS
+    label9:
+      combination_query: 'select * from dc_diag8
+
+        union
+
+        select * from jc_diag8
+
+        '
+      cte_expression: "dc_diag8 as (\n    select joid, true as label\n    from clean.joco110hsccclientmisc2eadiagnosis\
+        \ hscc_diag\n    where (hscc_diag.admission_date < ('{as_of_date}'::date +\
+        \ interval '{months_future} months')\n            and hscc_diag.admission_date\
+        \ > '{as_of_date}'::date)\n            and (hscc_diag.primary_diagnosis_classification\
+        \ = 'SUBSTANCE-RELATED OR ADDICTIVE'\n              or hscc_diag.secondary_diagnosis_classification\
+        \ = 'SUBSTANCE-RELATED OR ADDICTIVE')\n),\njc_diag8 as (\n    select joid,\
+        \ true as label\n    from clean.jocojcmhcdiagnoses mhc\n    where (mhc.dx_date\
+        \ < ('{as_of_date}'::date + interval '{months_future} months')\n         \
+        \   and mhc.dx_date > '{as_of_date}'::date)\n            and mhc.diagnosis_classification\
+        \ = 'SUBSTANCE-RELATED OR ADDICTIVE'\n)\n"
+      label_name: SUBSTANCE USE DIAGNOSIS
+  months_future: 6
+  selected_labels:
+  - DEATH BY SUICIDE
+  - SUICIDE ATTEMPT AMBULANCE RUN
+  - SUICIDAL AMBULANCE RUN
+models:
+  sklearn.ensemble.RandomForestClassifier:
+    max_depth:
+    - 100
+    - 250
+    max_features:
+    - sqrt
+    min_samples_split:
+    - 10
+    n_estimators:
+    - 1000
+    - 10000
+    n_jobs:
+    - 90
+nr_cores: 85
+parallel: 1
+temporal:
+  absolute_train_start: '2017-06-01'
+  fold_shift_months: 3
+  latest_validation_date: '2021-09-01'
+  max_train_history_months: 60
+  min_train_history_months: 0
+  multiple_folds: 1
+  train_sampling_freq_months: 3
